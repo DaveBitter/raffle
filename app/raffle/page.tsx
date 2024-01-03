@@ -5,7 +5,7 @@ import { Button } from "@radix-ui/themes";
 import Link from "next/link";
 import { hri } from "human-readable-ids";
 
-export default function Home() {
+export default function Raffle() {
   const id = hri.random();
 
   return (

@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SiteMeta />
       </head>
       <body>
-        <Theme hasBackground={false} appearance="dark" accentColor="iris">
+        <Theme hasBackground={false} appearance="dark" accentColor="gray">
           <div className="bg-black">{children}</div>
         </Theme>
       </body>
