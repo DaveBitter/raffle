@@ -13,6 +13,7 @@ export default function RaffleOverview({
   params,
 }: {
   children: ReactNode;
+  params: any
 }) {
   const socket = useMemo(() => getSocket(), []);
 

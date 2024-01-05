@@ -18,12 +18,12 @@ io.on("connection", (socket) => {
     io.emit(`updated-participants-raffle-${raffleId}`, raffles[raffleId] || []);
   });
 
-  socket.on("join_raffle", ({ raffleId, name }) => {
+  socket.on("join_raffle", ({ raffleId, name, uuid }) => {
     if (!raffles[raffleId]) {
       raffles[raffleId] = [];
     }
 
-    raffles[raffleId].push({ name, socketId: socket.id });
+    raffles[raffleId].push({ name, uuid, socketId: socket.id });
 
     socket.join(raffleId);
     console.log(
