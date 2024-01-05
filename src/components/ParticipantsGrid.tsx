@@ -30,9 +30,9 @@ const getRandomGridArea = () => {
     const randomColumnPicker = Math.floor(Math.random() * columnAreas.length)
 
     const row = rowAreas[randomRowPicker]
-    rowAreas.splice(randomRowPicker, 1)
+    // rowAreas.splice(randomRowPicker, 1)
     const col = columnAreas[randomColumnPicker]
-    columnAreas.splice(randomColumnPicker, 1)
+    // columnAreas.splice(randomColumnPicker, 1)
 
     return `${row}/${col}`;
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import {ReactNode, useEffect, useMemo, useState} from "react";
-import {usePathname} from "next/navigation";
 
 import {QRCodeSVG} from "qrcode.react";
 import {getSocket} from "@/src/utils/socket";
@@ -17,6 +16,7 @@ export default function RaffleOverview({params}: {
     const socket = useMemo(() => getSocket(), []);
 
     const [participants, setParticipants] = useState<Participant[]>([]);
+    const [isRaffling, setIsRaffling] = useState<boolean>(false);
     const [winner, setWinner] = useState<Participant | null>(null);
 
     useEffect(() => {
@@ -33,18 +33,12 @@ export default function RaffleOverview({params}: {
         socket.emit("emit_raffle_participants", {raffleId});
     }, []);
 
-    const handlePickWinner = () => {
-        const {raffleId} = params;
-
-        socket.emit(`pick_raffle_winner`, {raffleId});
-    };
-
-    if (Boolean(winner)) return (
-        <div className="flex min-h-screen flex-col items-center gap-8 justify-center p-12"><p
-            className="text-5xl">{winner?.name} won!</p>
-            <Button role="a" size="4" onClick={handlePickWinner}>
-                <MagicWandIcon width="16" height="16"/> Pick another winner
-            </Button></div>
+    if (isRaffling) return (
+        <div className="flex min-h-screen flex-col items-center gap-8 justify-center p-12">
+            <Winner realWinner={winner} participants={participants} onPickWinner={() => {
+                socket.emit(`pick_raffle_winner`, {raffleId: params.raffleId});
+            }}/>
+        </div>
     )
 
     return (
@@ -58,7 +52,7 @@ export default function RaffleOverview({params}: {
                     typeof window !== "undefined" ? window.location.href : ""
                 }/join`}
             />
-            <Button role="a" size="4" onClick={handlePickWinner}>
+            <Button role="a" size="4" onClick={() => setIsRaffling(true)}>
                 <MagicWandIcon width="16" height="16"/> Pick random winner
             </Button>
             <h2 className="text-2xl">Who joined?</h2>
@@ -67,3 +61,38 @@ export default function RaffleOverview({params}: {
     );
 }
 
+const Winner = ({realWinner, participants, onPickWinner}: {
+    realWinner: Participant | null,
+    participants: Participant[],
+    onPickWinner: () => void
+}) => {
+
+    const [winner, setWinner] = useState<Participant>(getRandomName(participants))
+
+    useEffect(() => {
+        const nameInterval = setInterval(() => {
+            setWinner(getRandomName(participants))
+        }, 50);
+        setTimeout(() => {
+            clearInterval(nameInterval)
+            onPickWinner()
+        }, 5000)
+        return () => clearInterval(nameInterval);
+    }, [participants])
+
+    useEffect(() => {
+        if (realWinner) {
+            setWinner(realWinner)
+        }
+    }, [realWinner]);
+
+    return (
+        <div>
+            <p className="text-5xl">{winner?.name} {realWinner && "won!"}</p>
+        </div>
+    )
+}
+
+const getRandomName = (participants: Participant[]) => (
+    participants[Math.floor(Math.random() * participants.length)]
+)
