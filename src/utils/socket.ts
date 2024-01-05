@@ -3,7 +3,7 @@ import io from "socket.io-client";
 const url =
   process.env.NODE_ENV === "development"
     ? "http://localhost:3001"
-    : "https://5d88-78-108-140-58.ngrok-free.app";
+    : "https://m1dm5fln-3001.euw.devtunnels.ms";
 let socket;
 
 export const getSocket = () => {
