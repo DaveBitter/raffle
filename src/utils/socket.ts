@@ -1,5 +1,4 @@
 import io from "socket.io-client";
-import "dotenv/config";
 
 const url =
   process.env.NODE_ENV === "development"
