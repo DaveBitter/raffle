@@ -38,6 +38,14 @@ export default function RaffleOverview({params}: {
         socket.emit(`pick_raffle_winner`, {raffleId});
     };
 
+    if (Boolean(winner)) return (
+        <div className="flex min-h-screen flex-col items-center gap-8 justify-center p-12"><p
+            className="text-5xl">{winner?.name} won!</p>
+            <Button role="a" size="4" onClick={handlePickWinner}>
+                <MagicWandIcon width="16" height="16"/> Pick another winner
+            </Button></div>
+    )
+
     return (
         <div className="flex min-h-screen flex-col items-center gap-8 justify-center p-12">
             <h1 className="text-5xl">Join the raffle</h1>
@@ -52,14 +60,8 @@ export default function RaffleOverview({params}: {
             <Button role="a" size="4" onClick={handlePickWinner}>
                 <MagicWandIcon width="16" height="16"/> Pick random winner
             </Button>
-            {winner ? (
-                <p className="text-2xl">{winner.name} won!</p>
-            ) : (
-                <>
-                    <h2 className="text-2xl">Who joined?</h2>
-                    <ParticipantsGrid participants={participants}/>
-                </>
-            )}
+            <h2 className="text-2xl">Who joined?</h2>
+            <ParticipantsGrid participants={participants}/>
         </div>
     );
 }
