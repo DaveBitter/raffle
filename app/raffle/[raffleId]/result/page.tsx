@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useId, useMemo, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import { Button, Card, Text, TextField } from "@radix-ui/themes";
 import { MagicWandIcon } from "@radix-ui/react-icons";
@@ -11,6 +12,19 @@ export default function RaffleResult({ params }) {
 
   const [participants, setParticipants] = useState([]);
   const [winner, setWinner] = useState(null);
+
+  const userId = useMemo(() => {
+    const cachedUserId = localStorage.getItem("userId");
+
+    if (cachedUserId) {
+      return cachedUserId;
+    }
+
+    const newUserId = uuidv4();
+
+    localStorage.setItem("userId", newUserId);
+    return newUserId;
+  }, []);
 
   useEffect(() => {
     const { raffleId } = params;
@@ -34,7 +48,7 @@ export default function RaffleResult({ params }) {
         )}
         {winner && (
           <>
-            {winner?.socketId === socket.id ? (
+            {winner?.userId === userId ? (
               <p>You won!</p>
             ) : (
               <p>{winner?.name} won</p>

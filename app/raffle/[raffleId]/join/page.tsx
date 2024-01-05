@@ -1,7 +1,8 @@
 "use client";
 
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo, useId } from "react";
 import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
 
 import { Button, Card, Text, TextField } from "@radix-ui/themes";
 import { MagicWandIcon } from "@radix-ui/react-icons";
@@ -12,6 +13,19 @@ export default function RaffleJoin({ params }) {
   const router = useRouter();
   const socket = useMemo(() => getSocket(), []);
 
+  const userId = useMemo(() => {
+    const cachedUserId = localStorage.getItem("userId");
+
+    if (cachedUserId) {
+      return cachedUserId;
+    }
+
+    const newUserId = uuidv4();
+
+    localStorage.setItem("userId", newUserId);
+    return newUserId;
+  }, []);
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -19,7 +33,7 @@ export default function RaffleJoin({ params }) {
     const name = formData.get("name");
     const { raffleId } = params;
 
-    socket.emit("join_raffle", { name, raffleId });
+    socket.emit("join_raffle", { name, raffleId, userId });
 
     router.push(`/raffle/${raffleId}/result`);
   };

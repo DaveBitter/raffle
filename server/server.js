@@ -18,16 +18,28 @@ io.on("connection", (socket) => {
     io.emit(`updated-participants-raffle-${raffleId}`, raffles[raffleId] || []);
   });
 
-  socket.on("join_raffle", ({ raffleId, name, uuid }) => {
+  socket.on("join_raffle", ({ raffleId, name, userId }) => {
     if (!raffles[raffleId]) {
       raffles[raffleId] = [];
     }
 
-    raffles[raffleId].push({ name, uuid, socketId: socket.id });
+    if (
+      raffles[raffleId].find((participant) => participant.userId === userId)
+    ) {
+      raffles[raffleId] = raffles[raffleId].map((participant) => {
+        if (participant.userId === userId) {
+          return { ...participant, socketId: socket.id };
+        }
+
+        return participant;
+      });
+    } else {
+      raffles[raffleId].push({ name, userId, socketId: socket.id });
+    }
 
     socket.join(raffleId);
     console.log(
-      `user with [socket-id]-${socket.id} and [name]-${name} joined [raffle]-${raffleId} with ${raffles[raffleId].length} participants`
+      `user with [socket-id]-${socket.id}, [user-id]-${userId} and [name]-${name} joined [raffle]-${raffleId} with ${raffles[raffleId].length} participants`
     );
 
     io.emit(`updated-participants-raffle-${raffleId}`, raffles[raffleId]);
