@@ -2,13 +2,18 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
+require("dotenv").config();
+
 const httpServer = http.createServer();
 
 const raffles = {};
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000", // Replace with your frontend URL
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://raffle.davebitter.com",
     methods: ["GET", "POST"],
   },
 });
