@@ -4,15 +4,24 @@ import {useMemo} from "react";
 const GRID_ROWS = 10;
 const GRID_COLS = 5;
 
-const rowAreas = Array.from({length: GRID_ROWS}, (_, i) => i + 1)
-const columnAreas = Array.from({length: GRID_COLS}, (_, i) => i + 1)
-
 export const ParticipantsGrid = ({participants}: { participants: Participant[] }) => {
     const participantsMap = useMemo(() => {
-        return participants.map((participant) => ({
-            ...participant,
-            gridArea: getRandomGridArea()
-        }))
+        const rowAreas = Array.from({length: GRID_ROWS}, (_, i) => i + 1)
+        const columnAreas = Array.from({length: GRID_COLS}, (_, i) => i + 1)
+
+        return participants.map((participant) => {
+            const randomRowPicker = Math.floor(Math.random() * rowAreas.length)
+            const randomColumnPicker = Math.floor(Math.random() * columnAreas.length)
+            const row = rowAreas[randomRowPicker]
+            const col = columnAreas[randomColumnPicker]
+            rowAreas.splice(randomRowPicker, 1)
+            columnAreas.splice(randomColumnPicker, 1)
+
+            return ({
+                ...participant,
+                gridArea: `${row}/${col}`
+            })
+        })
     }, [participants.length]);
 
     return (
@@ -25,14 +34,3 @@ export const ParticipantsGrid = ({participants}: { participants: Participant[] }
     );
 }
 
-const getRandomGridArea = () => {
-    const randomRowPicker = Math.floor(Math.random() * rowAreas.length)
-    const randomColumnPicker = Math.floor(Math.random() * columnAreas.length)
-
-    const row = rowAreas[randomRowPicker]
-    // rowAreas.splice(randomRowPicker, 1)
-    const col = columnAreas[randomColumnPicker]
-    // columnAreas.splice(randomColumnPicker, 1)
-
-    return `${row}/${col}`;
-}
