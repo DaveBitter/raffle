@@ -1,8 +1,9 @@
 version: '1.0'
 services:
-  raffle:
+  app:
     build:
       context: './'
+    container_name: raffle-app
     restart: always
     ports:
       - 8000:3000
