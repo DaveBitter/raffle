@@ -6,7 +6,6 @@ const url = config.serverUrl
 let socket: any;
 
 export const getSocket = () => {
-    console.log(url);
     if (!socket) {
         socket = io(url);
     }
