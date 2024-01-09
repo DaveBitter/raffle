@@ -8,6 +8,7 @@ import {MagicWandIcon} from "@radix-ui/react-icons";
 import {Button} from "@radix-ui/themes";
 import {Participant} from "@/src/types/raffle";
 import {ParticipantsGrid} from "@/src/components/ParticipantsGrid";
+import {config} from "@/config";
 
 export default function RaffleOverview({params}: {
     children: ReactNode;
@@ -18,10 +19,9 @@ export default function RaffleOverview({params}: {
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [isRaffling, setIsRaffling] = useState<boolean>(false);
     const [winner, setWinner] = useState<Participant | null>(null);
+    const {raffleId} = params;
 
     useEffect(() => {
-        const {raffleId} = params;
-
         socket.on(`updated-participants-raffle-${raffleId}`, (data: Participant[]) => {
             setParticipants(data);
         });
@@ -48,9 +48,7 @@ export default function RaffleOverview({params}: {
                 size={420}
                 fgColor="black"
                 bgColor="gray"
-                value={`${
-                    typeof window !== "undefined" ? window.location.href : ""
-                }/join`}
+                value={`${config.clientUrl}/raffle/${raffleId}/join`}
             />
             <Button role="a" size="4" onClick={() => setIsRaffling(true)}>
                 <MagicWandIcon width="16" height="16"/> Pick random winner
