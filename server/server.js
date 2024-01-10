@@ -8,11 +8,9 @@ const raffles = {};
 
 const io = new Server(httpServer, {
     cors: {
-        origin: process.env.NEXT_PUBLIC_CLIENT_URL || "http://localhost:8000"
+        origin: [process.env.NEXT_PUBLIC_CLIENT_URL || "http://localhost:8000", "https://raffle.davebitter.com"]
     },
 });
-
-console.log(process.env.NEXT_PUBLIC_CLIENT_URL)
 
 io.on("connection", (socket) => {
     socket.on("emit_raffle_participants", ({raffleId}) => {

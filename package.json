@@ -9,7 +9,7 @@
     "next:build": "next build",
     "next:start": "next start",
     "next:lint": "next lint",
-    "server:dev": "nodemon ./server/server",
+    "server:dev": "NEXT_PUBLIC_CLIENT_URL=http://localhost:3000 nodemon ./server/server",
     "server:start": "node ./server/server"
   },
   "dependencies": {
