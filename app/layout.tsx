@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             target="__blank"
             className="fixed top-8 right-8"
           >
-            <GitHubLogoIcon width="64" height="64" />
+            <GitHubLogoIcon width="32" height="32" />
           </a>
         </Theme>
       </body>
