@@ -7,7 +7,7 @@ import { getSocket } from "@/src/utils/socket";
 import { MagicWandIcon } from "@radix-ui/react-icons";
 import { Button } from "@radix-ui/themes";
 import { Participant } from "@/src/types/raffle";
-import { ParticipantsGrid } from "@/src/components/ParticipantsGrid";
+import { ParticipantsGrid } from "@/src/components/ParticipantsGrid/ParticipantsGrid";
 import { config } from "@/config";
 
 export default function RaffleOverview({
@@ -19,8 +19,13 @@ export default function RaffleOverview({
   const socket = useMemo(() => getSocket(), []);
 
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [isRaffling, setIsRaffling] = useState<boolean>(false);
-  const [winner, setWinner] = useState<Participant | null>(null);
+  const [state, setState] = useState<"INITIAL" | "PICKING" | "PICKED">(
+    "INITIAL"
+  );
+  const [winners, setWinners] = useState<Participant[]>([]);
+  const [potentialWinner, setPotentialWinner] = useState<
+    Participant | undefined
+  >(undefined);
   const { raffleId } = params;
 
   useEffect(() => {
@@ -32,81 +37,59 @@ export default function RaffleOverview({
     );
 
     socket.on(`raffle_winner_${raffleId}`, (data: Participant) => {
-      setWinner(data);
+      setState("PICKED");
+      setWinners([...winners, data]);
     });
 
     socket.emit("emit_raffle_participants", { raffleId });
   }, []);
 
-  if (isRaffling)
-    return (
-      <div className="flex min-h-screen flex-col items-center gap-8 justify-center p-12">
-        <Winner
-          realWinner={winner}
-          participants={participants}
-          onPickWinner={() => {
-            socket.emit(`pick_raffle_winner`, { raffleId: params.raffleId });
-          }}
-        />
-      </div>
-    );
+  const pickWinner = () => {
+    setState("PICKING");
 
-  return (
-    <div className="flex min-h-screen flex-col items-center gap-8 justify-center p-12">
-      <h1 className="text-5xl">Join the raffle</h1>
-      <QRCodeSVG
-        size={420}
-        fgColor="black"
-        bgColor="gray"
-        value={`${config.clientUrl}/raffle/${raffleId}/join`}
-      />
-      <Button role="a" size="4" onClick={() => setIsRaffling(true)}>
-        <MagicWandIcon width="16" height="16" /> Pick random winner
-      </Button>
-      <h2 className="text-2xl">Who joined?</h2>
-      <ParticipantsGrid participants={participants} />
-    </div>
-  );
-}
+    const getRandomName = (participants: Participant[]) =>
+      participants[Math.floor(Math.random() * participants.length)];
 
-const Winner = ({
-  realWinner,
-  participants,
-  onPickWinner,
-}: {
-  realWinner: Participant | null;
-  participants: Participant[];
-  onPickWinner: () => void;
-}) => {
-  const [winner, setWinner] = useState<Participant>(
-    getRandomName(participants)
-  );
-
-  useEffect(() => {
     const nameInterval = setInterval(() => {
-      setWinner(getRandomName(participants));
+      setPotentialWinner(getRandomName(participants));
     }, 50);
     setTimeout(() => {
       clearInterval(nameInterval);
-      onPickWinner();
+      setPotentialWinner(undefined);
+      socket.emit(`pick_raffle_winner`, { raffleId });
     }, 5000);
-    return () => clearInterval(nameInterval);
-  }, []);
-
-  useEffect(() => {
-    if (realWinner) {
-      setWinner(realWinner);
-    }
-  }, [realWinner]);
+  };
 
   return (
-    <div>
-      <p className="text-5xl">
-        {winner?.name} {realWinner && "won!"}
-      </p>
+    <div className="flex min-h-screen flex-col items-center gap-8 justify-center p-12">
+      {state === "INITIAL" && (
+        <>
+          <h1 className="text-5xl uppercase tracking-widest">scan to enter</h1>
+          <QRCodeSVG
+            size={256}
+            fgColor="white"
+            bgColor="transparent"
+            value={`${config.clientUrl}/raffle/${raffleId}/join`}
+          />
+        </>
+      )}
+      <ParticipantsGrid
+        participants={participants}
+        potentialWinner={potentialWinner}
+        winners={winners}
+      />
+      {state !== "PICKING" && (
+        <Button
+          role="a"
+          size="4"
+          variant="surface"
+          highContrast
+          onClick={pickWinner}
+        >
+          <MagicWandIcon width="16" height="16" />
+          {state === "INITIAL" ? "Pick winner" : "Pick another winner"}
+        </Button>
+      )}
     </div>
   );
-};
-
-const getRandomName = (participants: Participant[]) =>
-  participants[Math.floor(Math.random() * participants.length)];
+}

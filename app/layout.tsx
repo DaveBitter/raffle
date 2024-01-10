@@ -3,7 +3,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
-import { Theme } from "@radix-ui/themes";
+import { Theme, Button } from "@radix-ui/themes";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+
 import { ReactNode } from "react";
 import { SiteMeta } from "@/src/components/SiteMeta/SIteMeta";
 
@@ -16,8 +18,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SiteMeta />
       </head>
       <body>
-        <Theme hasBackground={false} appearance="dark" accentColor="gray">
-          <div className="bg-black">{children}</div>
+        <Theme hasBackground={false} appearance="dark" accentColor="iris">
+          <div>{children}</div>
+          <a
+            href="https://github.com/DaveBitter/raffle"
+            target="__blank"
+            className="fixed top-8 right-8"
+          >
+            <GitHubLogoIcon width="64" height="64" />
+          </a>
         </Theme>
       </body>
     </html>
