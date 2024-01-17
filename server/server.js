@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
                 return participant;
             });
         } else {
-            raffles[raffleId].participants.push({
+            raffles[raffleId]?.participants?.push({
                 name,
                 userId,
                 socketId: socket.id,
